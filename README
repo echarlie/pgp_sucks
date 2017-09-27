@@ -1,0 +1,8 @@
+see http://texdoc.net/texmf-dist/doc/latex/beamer/doc/beameruserguide.pdf for
+more info on beamer theming
+
+This incorporates the official VT [brand colors](https://vt.edu/brand.html)
+into a theme.
+
+Works mostly with outer themes of smoothbars, miniframes, and tree. others are
+not as nice for what is specified in beamercolorthemeHokieLayout.sty
