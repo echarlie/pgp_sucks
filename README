@@ -1,8 +1,4 @@
-see http://texdoc.net/texmf-dist/doc/latex/beamer/doc/beameruserguide.pdf for
-more info on beamer theming
-
-This incorporates the official VT [brand colors](https://vt.edu/brand.html)
-into a theme.
-
-Works mostly with outer themes of smoothbars, miniframes, and tree. others are
-not as nice for what is specified in beamercolorthemeHokieLayout.sty
+Presentation I gave to the Linux/Unix Users' Group at Virginia Tech
+(https://vtluug.org) about how much pgp sucks. If you see any keys for a
+"Wadsworth Luugbot" in the wild, please notify me; that was supposed to expire
+by now.
