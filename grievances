@@ -1,0 +1,8 @@
+setting up gpg as ssh-agent is complicated, and varies wildly by os and gpg version
+
+can't use multiple smartcards with same key
+
+can't have multiple subkeys for different devices and use them all (gpg defaults to newest for everything)
+
+gpg-agent is complicated
+
