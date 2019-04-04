@@ -183,6 +183,45 @@
 		\includegraphics[height=210px]{adobe-3}
 	\end{center}
 \end{frame}
+\subsection{Keyservers}
+\begin{frame}
+	\frametitle{How about this?}
+	\begin{center}
+		\includegraphics[height=210px]{sks-1}
+	\end{center}
+\end{frame}
+\begin{frame}
+	\frametitle{And not in the pool?}
+	\begin{center}
+		\includegraphics[height=210px]{sks-2}
+	\end{center}
+\end{frame}
+\begin{frame}
+	\frametitle{Oh\ldots}
+	\begin{center}
+		\includegraphics[height=210px]{sks-3}
+	\end{center}
+\end{frame}
+\begin{frame}
+	\frametitle{Wow\ldots}
+	\begin{center}
+		\includegraphics[height=210px]{sks-4}
+	\end{center}
+\end{frame}
+\begin{frame}
+	\frametitle{Keyservers have problems}
+	\begin{itemize}
+		\item Can't delete keys from the keyserver
+		\item Keyservers leak lots of data to make PGP easier
+		\item Most of the keyservers are broken these days, b/c of
+			persistent attacks (fill up the disk).
+		\item in 2015, there were over 100 keyservers active in the
+			SKS pool; there are now 57.
+		\item It is hard to make sane decisions when automatically
+			downloading keys; short key IDs are the root of this
+			problem.
+	\end{itemize}
+\end{frame}
 \subsection{GnuPG}
 \begin{frame}
 	\frametitle{GnuPG is complicated}
@@ -198,6 +237,20 @@
 		\item integration of GPG with smartcards, using it as your ssh
 			keyring, and using it for x.509 certificates and s/mime
 			all add complexity
+	\end{itemize}
+\end{frame}
+\begin{frame}
+	\frametitle{``Secure keys'' are hard in GnuPG}
+	Personal story:
+	\begin{itemize}
+		\item I wanted seperate PGP keys on my laptop from my desktop;
+			multiple key pairs with one master
+		\item GPG perfectly allows me to strip subkeys out of a
+			keyring, s.t. I only have one signing and one
+			encryption key.
+		\item \emph{However}, GPG only allows me to encrypt to the
+			\alert{most recent} key!
+		\item (There are hacks around this, but they aren't general)
 	\end{itemize}
 \end{frame}
 \subsection{Theoretical Flaws}
@@ -247,11 +300,34 @@
 			Way}\texttrademark to use PGP, rather than some
 			standard being enforced by the tooling.
 		\item Short key IDs are default in most tools; collisions can
-			be made.
+			be made---indeed, the entire strongset was once duplicated.
 		\item Trust is largely external to tooling---there aren't many
 			good ways to verify people without meeting them
 			in-person
 	\end{itemize}
+\end{frame}
+\begin{frame}
+	\frametitle{Email Signing and encryption issues}
+	\begin{itemize}
+		\item ``EFail'', a CVE wherein broken MIME parsers are
+			exploited to render html wrapping an encrypted blob
+			(potentially sending the decrypted text to a malicious
+			URL)
+		\item Signature info can be forged; most MUAs render plain text
+			for signature info.
+		\item Message mangling: gmail (and others) mangle the body of
+			messages sent to mail lists, rather than appending a
+			text MIME attachment, causing signature validation to
+			fail.
+		\item Outlook and Plain text: a bug in outlook caused messages
+			to not be sent encrypted if they weren't multipart.
+	\end{itemize}
+\end{frame}
+\begin{frame}
+	\frametitle{Example of faked signatures in mutt:}
+	\begin{center}
+		\includegraphics[width=400px]{mutt}
+	\end{center}
 \end{frame}
 \subsection{Alternatives}
 \begin{frame}
