@@ -1,6 +1,9 @@
 project=pgp_sucks
 
-all: $(project).pdf 
+all: $(project).pdf
+
+# because vim-latexsuite
+pdf: $(project).pdf $(project).tex
 
 $(project).pdf: $(project).tex
 	pdflatex $(project)
