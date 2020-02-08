@@ -98,7 +98,9 @@
 			other software.
 	\end{itemize}
 \end{frame}
+
 \section{PGP in theory}
+
 \begin{frame}
 	\frametitle{PGP in the Real World}
 	\begin{itemize}
@@ -117,7 +119,7 @@
 		\item Basically, human trust models don't reflect machine trust
 			models---the WoT bridges this by putting the onus on
 			the user to verify identities of others.
-		\item No CAs or centralized authorities are relied on.
+		\item No reliance on CAs or centralized authorities.
 		\item This has the benefit that you can choose who you trust,
 			and how much you trust them, but trust can be
 			automatically computed.
@@ -141,11 +143,12 @@
 			Encrypting, and Authenticating.
 		\item Depending on key algorithm, you need a different type of
 			key for each---RSA supports all these modes, but DSA
-			does not.
+			and ed25519 do not.
 	\end{itemize}
 \end{frame}
 
 \section{PGP sucks}
+
 \begin{frame}
 	\frametitle{PGP Sucks}
 	\begin{itemize}
@@ -183,31 +186,11 @@
 		\includegraphics[height=210px]{adobe-3}
 	\end{center}
 \end{frame}
+
 \subsection{Keyservers}
-\begin{frame}
-	\frametitle{How about this?}
-	\begin{center}
-		\includegraphics[height=210px]{sks-1}
-	\end{center}
-\end{frame}
-\begin{frame}
-	\frametitle{And not in the pool? (circa Apr 2019)}
-	\begin{center}
-		\includegraphics[height=210px]{sks-2}
-	\end{center}
-\end{frame}
-\begin{frame}
-	\frametitle{Oh\ldots}
-	\begin{center}
-		\includegraphics[height=210px]{sks-3}
-	\end{center}
-\end{frame}
-\begin{frame}
-	\frametitle{Wow\ldots}
-	\begin{center}
-		\includegraphics[height=210px]{sks-4}
-	\end{center}
-\end{frame}
+
+% open sks-keyservers.net here
+
 \begin{frame}
 	\frametitle{Keyservers have problems}
 	\begin{itemize}
@@ -216,21 +199,54 @@
 		\item Most of the keyservers are broken these days, b/c of
 			persistent attacks (fill up the disk).
 		\item in 2015, there were over 100 keyservers active in the
-			SKS pool; there are now 57.
+			SKS pool; there are now 26.
 		\item It is hard to make sane decisions when automatically
-			downloading keys; short key IDs are the root of this
+			downloading keys; ``short'' key IDs are the root of this
 			problem.
 	\end{itemize}
 \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%
+% next section tl;dr:
+% https://gist.github.com/rjhansen/67ab921ffb4084c865b3618d6955275f
+%
+%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}
 	\frametitle{SKS software is a mess}
+	\begin{itemize}
+		\item The standard keyserver software is called SKS, for
+			"Synchronizing Key Server".
+		\item \alert{Yaron Minsky} devised algorithm that could do
+			reconciliations very quickly. SKS is \emph{proof of
+			concept} of his idea for his PhD Thesis.
+		\item Written in OCaml, and an idiosyncratic (i.e. PhD's)
+			dialect.
+	\end{itemize}
 	%% ocaml, grad student project, brokenness
 \end{frame}
 \begin{frame}
-	\frametitle{Double-opt-in \url{keys.openpgp.org}}
-	%% no sync, generally problematic
+	\frametitle{SKS software is a mess}
+	\begin{itemize}
+		\item Because of this, \alert{SKS is unmaintained}
+		\item Design goals are the reason SKS is vulnerable!
+		\item Public editing with no central authority makes tainting
+			data easy
+		\item Lack of central authority also makes design changes
+			impossible.
+	\end{itemize}
 \end{frame}
+
+%\begin{frame}
+%	\frametitle{Double-opt-in \url{keys.openpgp.org}}
+%	%% no sync, generally problematic
+%\end{frame}
+
+% alternative keyservers?
+
 \subsection{GnuPG}
+
 \begin{frame}
 	\frametitle{GnuPG is complicated}
 	\begin{itemize}
@@ -261,7 +277,9 @@
 		\item (There are hacks around this, but they aren't general)
 	\end{itemize}
 \end{frame}
+
 \subsection{Theoretical Flaws}
+
 \begin{frame}
 	\frametitle{Key trust is complicated}
 	\begin{itemize}
@@ -296,7 +314,9 @@
 			new key and a complete loss of your trust!
 	\end{itemize}
 \end{frame}
+
 \subsection{Implementation Flaws}
+
 \begin{frame}
 	\frametitle{Implementation Flaws}
 	\begin{itemize}
@@ -337,7 +357,73 @@
 		\includegraphics[width=400px]{mutt}
 	\end{center}
 \end{frame}
+
+\subsection{Active Attacks}
+
+\begin{frame}
+	\frametitle{Certificate Spamming attack}
+	\begin{itemize}
+		\item OpenPGP \emph{doesn't limit} how many signatures can be
+			attached to a certificate.
+		\item SKS handles certificates with up to about \alert{150,000
+			signatures}.\pause
+		\item GnuPG doesn't. \emph{Any time} GnuPG has to deal with
+			such a spammed certificate, GnuPG
+			\alert{grinds to a halt}.
+	\end{itemize}
+\end{frame}
+
+%literal quote from https://gist.github.com/rjhansen/67ab921ffb4084c865b3618d6955275f
+\begin{frame}
+	\frametitle{Certificate Spamming attack}
+	Consequences:
+	\begin{itemize}
+		\item If you fetch a poisoned certificate from the keyserver
+			network, you will break your GnuPG installation.
+		\item Poisoned certificates cannot be deleted from the
+			keyserver network.
+		\item The number of deliberately poisoned certificates,
+			currently at only a few, will only rise over time.
+		\item We do not know whether the attackers are intent on
+			poisoning other certificates.
+		\item We do not even know the scope of the damage.
+	\end{itemize}
+\end{frame}
+\begin{frame}
+	\frametitle{Certificate Spamming attack}
+	More info:
+	\begin{itemize}
+		\item \url{https://dkg.fifthhorseman.net/blog/openpgp-certificate-flooding.html}
+		\item \url{https://gist.github.com/rjhansen/67ab921ffb4084c865b3618d6955275f}
+	\end{itemize}
+\end{frame}
+\begin{frame}
+	\frametitle{Potential Improvements and mitigations}
+	\begin{itemize}
+		\item Double opt-in \url{keys.openpgp.org}
+		\item Stop using Keyservers
+		\item more diversity in keyserver implementations (e.g.
+			Hockeypuck)
+	\end{itemize}
+\end{frame}
+
+% from https://keys.openpgp.org/about/faq
+\begin{frame}
+	\frametitle{Double-opt-in \url{keys.openpgp.org}}
+	\begin{itemize}
+		\item Public single-node keyserver running ``Hagrid'' software
+		\item Only distributes identity information for keys which have
+			verified email addresses
+		\item Non-identity (i.e. fingerprint and key, but not UIDs)
+			info distributed for all keys uploaded
+		\item Do not distribute third-party signatures. Must use
+			\alert{caff} or \alert{pius} to distribute signatures
+		\item does not distribute revokations!
+	\end{itemize}
+\end{frame}
+
 \subsection{Alternatives}
+
 \begin{frame}
 	\frametitle{PGP needs to die}
 	\begin{itemize}
@@ -353,12 +439,16 @@
 					trust
 				\item plain old s/mime with ca-certs --- better
 					supported for email
+				\item age --- like reop, but supports x25519
+					keys for ed25519 operations (e.g. ssh
+					keys)
 					% watch https://blog.filippo.io/using-ed25519-keys-for-encryption/ too -- age
 			\end{itemize}
 	\end{itemize}
 \end{frame}
 
 \section{Pragmatic PGP}
+
 \begin{frame}
 	\frametitle{Pragmatic PGP}
 	Still want to use PGP? 
@@ -391,7 +481,8 @@
 	\begin{itemize}
 		\item How can you tell if a key is valid?\pause
 		\item Trivial case: unexpired key that you've signed
-		\item Or an expired or revoked key---clearly you \emph{shouldn't} trust it\pause
+		\item Or an expired or revoked key---clearly you \emph{shouldn't} trust
+				it (and PGP won't let you)\pause
 		\item Less trivial: key is signed by people you ``trust''
 	\end{itemize}
 \end{frame}
@@ -420,7 +511,8 @@
 			which is great unless someone installs a
 			\alert{keylogger}.
 		\item \alert{pew} has copies of my (encrypted) PGP
-			subkeys---should I revoke?
+				subkeys---should I revoke? (at time of updating, these have
+				been revoked, for unrelated reasons)
 	\end{itemize}
 \end{frame}
 \begin{frame}
@@ -438,8 +530,9 @@
 	\frametitle{Threat models}
 	\begin{itemize}
 		\item \alert{PGP IS NOT A PANACEA!!!}
-		\item If I haven't made it clear, PGP is powerful, but only if
-			you understand basic opsec, and what the tool does.
+		\item If I haven't made it clear, PGP is powerful, but only if you
+			understand basic opsec (topic of a very different talk), and
+			what the tool does.
 		\item PGP is useless unless you and the party you're communicating with:
 			\begin{itemize}
 				\item Have PGP keys
@@ -486,15 +579,15 @@
 		\item If you're a masochist, I suppose you could use
 			\alert{Symantec PGP}. Tell me how that goes.
 	\end{itemize}
-	I strictly use GnuPG 2.x; 1.4 (shipped by default with Ubuntu and
-	Fedora) has a lot of flaws and is not actively developed. Use the
-	\texttt{gpg2} binary on these distros.
+	I strictly use GnuPG 2.x; 1.4 (shipped by default through Ubuntu 16.04
+	and Fedora 28) has a lot of flaws and is not actively developed. Use
+	the \texttt{gpg2} binary on these distros.
 \end{frame}
 \begin{frame}
 	\frametitle{A note on PGP GUIs}
 	There are a lot of PGP GUIs; both gpgtools and gpg4win ship them. GNOME
 	and KDE also have their own. These do not make it much easier to manage
-	your key, and make fucking up much easier!
+	your key, and make messing up much easier!
 
 	GNOME Keyring actively sucks when using GPG and \emph{will} get in the
 	way eventually!
